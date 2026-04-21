@@ -29,17 +29,18 @@ test.describe('Posts API', () => {
     expect(body).toHaveProperty('body');
   });
 
-  test('POST /posts creates a new post', async () => {
-    const response = await posts.create({
-      userId: 1,
-      title:  'test post',
-      body:   'test body',
-    });
-    const body = await response.json() as Post;
+  test('POST /posts returns 201 with a numeric id and echoed payload', async () => {
+    const payload = { userId: 1, title: 'test title', body: 'test body' };
+    const response = await posts.create(payload);
 
     expect(response.status()).toBe(201);
-    expect(body.title).toBe('test post');
-    expect(body.id).toBeDefined();
+
+    const body = await response.json() as Post;
+    expect(typeof body.id).toBe('number');
+    expect(body.id).toBeGreaterThan(0);
+    expect(body.title).toBe(payload.title);
+    expect(body.body).toBe(payload.body);
+    expect(body.userId).toBe(payload.userId);
   });
 
   test('PATCH /posts/:id updates a post', async () => {
