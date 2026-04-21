@@ -14,10 +14,12 @@
     "types": ["node"],
     "baseUrl": ".",
     "paths": {
+      "@api/*":         ["src/api/*"],
       "@controllers/*": ["src/controllers/*"],
       "@models/*":      ["src/models/*"],
       "@utils/*":       ["src/utils/*"],
-      "@config/*":      ["src/config/*"]
+      "@config/*":      ["src/config/*"],
+      "@fixtures/*":    ["src/fixtures/*"]
     }
   },
   "include": ["src/**/*", "tests/**/*"],

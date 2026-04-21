@@ -1,11 +1,11 @@
 import { type APIRequestContext, type APIResponse } from '@playwright/test';
 import { ApiClient } from '@api/client';
 import { BaseController } from './base.controller';
-import { type CreatePostPayload, type UpdatePostPayload } from '@models/post.model';
+import { type CreateUserPayload, type UpdateUserPayload } from '@models/user.model';
 
-export class PostController extends BaseController {
+export class UserController extends BaseController {
   constructor(request: APIRequestContext) {
-    super(new ApiClient(request), '/posts');
+    super(new ApiClient(request), '/users');
   }
 
   getAll(): Promise<APIResponse> {
@@ -16,15 +16,15 @@ export class PostController extends BaseController {
     return this.client.get(this.url(`/${id}`));
   }
 
-  create(payload: CreatePostPayload): Promise<APIResponse> {
+  create(payload: CreateUserPayload): Promise<APIResponse> {
     return this.client.post(this.url(), payload);
   }
 
-  replace(id: number, payload: CreatePostPayload): Promise<APIResponse> {
+  replace(id: number, payload: CreateUserPayload): Promise<APIResponse> {
     return this.client.put(this.url(`/${id}`), payload);
   }
 
-  update(id: number, payload: UpdatePostPayload): Promise<APIResponse> {
+  update(id: number, payload: UpdateUserPayload): Promise<APIResponse> {
     return this.client.patch(this.url(`/${id}`), payload);
   }
 

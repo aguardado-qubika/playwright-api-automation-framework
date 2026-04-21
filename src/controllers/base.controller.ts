@@ -1,18 +1,16 @@
-import { APIRequestContext } from '@playwright/test';
+import { ApiClient } from '@api/client';
 
 /**
- * BaseController — the API equivalent of a Base Page Object.
+ * BaseController — shared URL construction for every resource controller.
  *
- * Every resource controller extends this class and inherits:
- *   - A scoped request context
- *   - The resource endpoint path
- *   - A consistent way to build URLs
- *
- * No test logic lives here. No assertions. Pure HTTP mechanics.
+ * Rules:
+ *   - No HTTP calls here — those live in the resource subclass.
+ *   - No assertions — those live in the test spec.
+ *   - Accepts ApiClient so all headers and transport are managed centrally.
  */
 export abstract class BaseController {
   constructor(
-    protected readonly request: APIRequestContext,
+    protected readonly client: ApiClient,
     protected readonly basePath: string
   ) {}
 

@@ -6,3 +6,4 @@ export interface Todo {
 }
 
 export type CreateTodoPayload = Omit<Todo, 'id'>;
+export type UpdateTodoPayload = Partial<CreateTodoPayload>;
