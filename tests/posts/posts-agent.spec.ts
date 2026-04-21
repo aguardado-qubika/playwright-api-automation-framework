@@ -1,31 +1,23 @@
-import { test, expect } from '@playwright/test';
-import { PostController } from '@controllers/post.controller';
-import { Post } from '@models/post.model';
+import { test, expect }  from '@fixtures/index';
+import { expectAPI }     from '@utils/expect.helper';
+import { isPost }        from '@utils/schema.helper';
+import { STATUS }        from '@utils/constants';
+import { type Post }     from '@models/post.model';
 
-test.describe('Posts API — Agent Tests (SAU-61)', () => {
+test.describe('Posts API — Contract Tests', () => {
 
-  let posts: PostController;
-
-  test.beforeEach(({ request }) => {
-    posts = new PostController(request);
+  test('POST /posts returns 201 with a generated id', async ({ postController }) => {
+    const response = await postController.create({ userId: 1, title: 'test title', body: 'test body' });
+    expect(response.status()).toBe(STATUS.CREATED);
+    const body = await response.json() as Post;
+    expect(typeof body.id).toBe('number');
+    expect(body.id).toBeGreaterThan(0);
   });
 
-  // JSONPlaceholder simulates POST (always returns id:101, not persisted).
-  // The GET uses a seeded id to verify full Post schema independently.
-  test('POST /posts creates a post and GET /posts/:id returns full schema', async () => {
-    const createResponse = await posts.create({ userId: 1, title: 'test title', body: 'test body' });
-    expect(createResponse.status()).toBe(201);
-    const created = await createResponse.json() as Post;
-    expect(typeof created.id).toBe('number');
-    expect(created.id).toBeGreaterThan(0);
-
-    const getResponse = await posts.getById(1);
-    expect(getResponse.status()).toBe(200);
-    const fetched = await getResponse.json() as Post;
-    expect(typeof fetched.id).toBe('number');
-    expect(typeof fetched.userId).toBe('number');
-    expect(typeof fetched.title).toBe('string');
-    expect(typeof fetched.body).toBe('string');
+  test('GET /posts/:id returns full Post schema', async ({ postController }) => {
+    const response = await postController.getById(1);
+    await expect(response).toBeOK();
+    await expectAPI.bodyToMatchSchema(response, isPost);
   });
 
 });
