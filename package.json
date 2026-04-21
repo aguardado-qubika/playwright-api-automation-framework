@@ -1,0 +1,18 @@
+{
+  "name": "api-automation-framework",
+  "version": "0.1.0",
+  "description": "Skill-Ready API Automation Framework — Pure Executor",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:posts": "playwright test tests/posts",
+    "test:users": "playwright test tests/users",
+    "test:todos": "playwright test tests/todos",
+    "report": "playwright show-report reports/html"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^20.14.0",
+    "typescript": "^5.4.5"
+  }
+}

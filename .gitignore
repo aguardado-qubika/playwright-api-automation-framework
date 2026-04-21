@@ -1,0 +1,9 @@
+# AI Agentic Framework files
+.claude-temp/
+.claude-backups/
+qubika-agentic-framework/
+.claude/
+node_modules/
+reports/
+test-results/
+dist/
