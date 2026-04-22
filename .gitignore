@@ -1,3 +1,7 @@
+# Local secrets — never commit
+.env.local
+.env*.local
+
 # AI Agentic Framework files
 .claude-temp/
 .claude-backups/

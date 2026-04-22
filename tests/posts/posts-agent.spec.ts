@@ -1,6 +1,6 @@
 import { test, expect }  from '@fixtures/index';
 import { expectAPI }     from '@utils/expect.helper';
-import { isPost }        from '@utils/schema.helper';
+import { isPostArray } from '@utils/schema.helper';
 import { STATUS }        from '@utils/constants';
 import { type Post }     from '@models/post.model';
 
@@ -21,10 +21,25 @@ test.describe('API Tests', () => {
     expect(body.userId).toBe(payload.userId);
   });
 
-  test('GET /posts/:id returns full Post schema', async ({ postController }) => {
+  test('GET /posts/:id returns a single post with matching id', async ({ postController }) => {
     const response = await postController.getById(1);
+    expect(response.status()).toBe(STATUS.OK);
+
+    const body = await response.json() as Post;
+    expect(Array.isArray(body)).toBe(false);
+    expect(body.id).toBe(1);
+    expect(body).toHaveProperty('userId');
+    expect(body).toHaveProperty('title');
+    expect(body).toHaveProperty('body');
+  });
+
+  test('GET /posts returns a non-empty array of posts', async ({ postController }) => {
+    const response = await postController.getAll();
     await expect(response).toBeOK();
-    await expectAPI.bodyToMatchSchema(response, isPost);
+    const body = await response.json() as Post[];
+    expect(Array.isArray(body)).toBe(true);
+    expect(body.length).toBeGreaterThan(0);
+    await expectAPI.bodyToMatchSchema(response, isPostArray);
   });
 
 });
