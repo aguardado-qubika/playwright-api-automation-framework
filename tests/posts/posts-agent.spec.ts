@@ -4,7 +4,7 @@ import { isPost }        from '@utils/schema.helper';
 import { STATUS }        from '@utils/constants';
 import { type Post }     from '@models/post.model';
 
-test.describe('Posts API — Contract Tests', () => {
+test.describe('API Tests', () => {
 
   test('POST /posts returns 201 with a numeric id and echoed payload', async ({ postController }) => {
     const payload = { userId: 1, title: 'test title', body: 'test body' };
