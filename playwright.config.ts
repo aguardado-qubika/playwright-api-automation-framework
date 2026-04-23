@@ -1,4 +1,16 @@
 import { defineConfig } from '@playwright/test';
+import { existsSync, readFileSync } from 'fs';
+import { resolve } from 'path';
+
+// Load .env.local (gitignored) so secrets are available at test runtime.
+// ??= preserves values already injected by CI.
+const envLocalPath = resolve('.env.local');
+if (existsSync(envLocalPath)) {
+  for (const line of readFileSync(envLocalPath, 'utf-8').split('\n')) {
+    const m = line.match(/^([^=#\s]+)\s*=\s*(.+)$/);
+    if (m) process.env[m[1]] ??= m[2].trim();
+  }
+}
 
 export default defineConfig({
   testDir: './tests',
@@ -16,10 +28,11 @@ export default defineConfig({
   ],
 
   use: {
-    baseURL: process.env.BASE_URL ?? 'https://jsonplaceholder.typicode.com',
+    baseURL: process.env.BASE_URL ?? 'https://api.mockfly.dev/mocks/cab5e087-09ad-424c-b618-52f3993993f0',
     extraHTTPHeaders: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
+      'x-api-key': process.env.API_KEY ?? '',
     },
     trace: 'on-first-retry',
   },

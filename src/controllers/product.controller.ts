@@ -1,30 +1,26 @@
 import { type APIRequestContext, type APIResponse } from '@playwright/test';
 import { ApiClient } from '@api/client';
 import { BaseController } from './base.controller';
-import { type CreatePostPayload, type UpdatePostPayload } from '@models/post.model';
+import { type CreateProductPayload, type UpdateProductPayload } from '@models/product.model';
 
-export class PostController extends BaseController {
+export class ProductController extends BaseController {
   constructor(request: APIRequestContext) {
-    super(new ApiClient(request), '/posts');
-  }
-
-  getAll(): Promise<APIResponse> {
-    return this.client.get(this.url());
+    super(new ApiClient(request), '/products');
   }
 
   getById(id: number): Promise<APIResponse> {
     return this.client.get(this.url(`/${id}`));
   }
 
-  create(payload: CreatePostPayload): Promise<APIResponse> {
+  create(payload: CreateProductPayload): Promise<APIResponse> {
     return this.client.post(this.url(), payload);
   }
 
-  replace(id: number, payload: CreatePostPayload): Promise<APIResponse> {
+  replace(id: number, payload: CreateProductPayload): Promise<APIResponse> {
     return this.client.put(this.url(`/${id}`), payload);
   }
 
-  update(id: number, payload: UpdatePostPayload): Promise<APIResponse> {
+  update(id: number, payload: UpdateProductPayload): Promise<APIResponse> {
     return this.client.patch(this.url(`/${id}`), payload);
   }
 

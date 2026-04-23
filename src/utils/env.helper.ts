@@ -1,12 +1,3 @@
-/**
- * EnvHelper — typed, validated access to environment variables.
- *
- * Usage:
- *   import { env } from '@utils/env.helper';
- *   env.baseUrl   // string
- *   env.headless  // boolean
- */
-
 function requireEnv(key: string): string {
   const value = process.env[key];
   if (!value) throw new Error(`Missing required environment variable: ${key}`);
@@ -18,10 +9,9 @@ function optionalEnv(key: string, fallback: string): string {
 }
 
 export const env = {
-  baseUrl:   optionalEnv('BASE_URL',   'https://jsonplaceholder.typicode.com'),
+  baseUrl:   optionalEnv('BASE_URL',  'https://api.mockfly.dev/mocks/cab5e087-09ad-424c-b618-52f3993993f0'),
+  apiKey:    requireEnv('API_KEY'),
   timeoutMs: Number(optionalEnv('TIMEOUT_MS', '10000')),
-  logLevel:  optionalEnv('LOG_LEVEL',  'info') as 'silent' | 'info' | 'debug',
-  headless:  optionalEnv('HEADLESS',   'true') === 'true',
-  // Add authenticated endpoints here when needed:
-  // apiKey: requireEnv('API_KEY'),
+  logLevel:  optionalEnv('LOG_LEVEL', 'info') as 'silent' | 'info' | 'debug',
+  headless:  optionalEnv('HEADLESS',  'true') === 'true',
 } as const;
