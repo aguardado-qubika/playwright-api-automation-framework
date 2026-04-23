@@ -7,7 +7,8 @@ export interface Product {
 export type CreateProductPayload = Omit<Product, 'id'>;
 export type UpdateProductPayload = Partial<CreateProductPayload>;
 
-export interface CreateProductResponse extends Product {
+export interface CreateProductResponse extends Omit<Product, 'id'> {
+  id:     string;
   status: string;
 }
 
