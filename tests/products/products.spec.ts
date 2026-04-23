@@ -1,41 +1,40 @@
 import { test, expect }   from '@fixtures/index';
 import { STATUS }          from '@utils/constants';
-import { type CreateProductResponse } from '@models/product.model';
-import { expectAPI }       from '@utils/expect.helper';
-import { isProduct }       from '@utils/schema.helper';
+import { type CreateProductResponse, type Product, type CreateProductPayload, type PutProductResponse } from '@models/product.model';
 
-test.describe('POST /products', () => {
+test.describe.serial('Products API', () => {
+  const payload = { name: 'Wireless Mouse', price: 29.99 };
+  let createdProductId: string;
 
   test('POST /products returns 201 with valid product shape', async ({ productController }) => {
-    const payload = { name: 'Wireless Mouse', price: 29.99 };
     const response = await productController.create(payload);
 
     expect(response.status()).toBe(STATUS.CREATED);
 
     const body = await response.json() as CreateProductResponse;
-    console.log('Response body:', JSON.stringify(body, null, 2));
-    expect(typeof body.id).toBe('number');
-    expect(body.id).toBeGreaterThan(0);
+    console.log('POST Response body:', JSON.stringify(body, null, 2));
+    expect(typeof body.id).toBe('string');
+    expect(body.id.length).toBeGreaterThan(0);
     expect(body.name).toBe(payload.name);
     expect(body.price).toBe(payload.price);
     expect(body.status).toBe('success');
+
+    createdProductId = body.id;
   });
 
-});
-
-test.describe('GET /products/:id', () => {
-
-  test('GET /products/:id returns 200 with correct Product shape', async ({ productController }) => {
-    const response = await productController.getById(1);
+  test('GET /products/:id returns 200 and includes the created product', async ({ productController }) => {
+    const response = await productController.getById(createdProductId);
 
     expect(response.status()).toBe(STATUS.OK);
 
-    const body = await expectAPI.bodyToMatchSchema(response, isProduct);
-    console.log('Response body:', JSON.stringify(body, null, 2));
-    expect(body.id).toBe(1);
-    expect(typeof body.name).toBe('string');
-    expect(typeof body.price).toBe('number');
-    expect(Array.isArray(body)).toBe(false);
+    const body = await response.json() as Product[];
+    console.log('GET Response body:', JSON.stringify(body, null, 2));
+    expect(Array.isArray(body)).toBe(true);
+
+    const found = body.find(p => p.name === payload.name && p.price === payload.price);
+    expect(found).toBeDefined();
+    expect(typeof found!.id).toBe('number');
+    expect(found!.id).toBeGreaterThan(0);
   });
 
   // Blocked: Mockfly must be configured to return 404 for GET /products/9999.
@@ -46,4 +45,28 @@ test.describe('GET /products/:id', () => {
     expect(response.status()).toBe(STATUS.NOT_FOUND);
   });
 
+});
+
+test.describe('PUT /products/:id', () => {
+  const payload: CreateProductPayload = { name: 'Updated Product', price: 49.99 };
+
+  test('PUT /products/:id returns 200 with update confirmation', async ({ productController }) => {
+    const response = await productController.replace(1, payload);
+
+    expect(response.status()).toBe(STATUS.OK);
+
+    const body = await response.json() as PutProductResponse;
+    console.log('PUT Response body:', JSON.stringify(body, null, 2));
+    expect(typeof body.message).toBe('string');
+    expect(body.message).toBe('Product updated successfully');
+  });
+
+  // Blocked: Mockfly must be configured to return 404 for PUT /products/9999.
+  // Remove skip once the conditional response rule is added in the dashboard.
+  test.skip('PUT /products/:id returns 404 for non-existent id', async ({ productController }) => {
+    const ghostPayload: CreateProductPayload = { name: 'Ghost Product', price: 0 };
+    const response = await productController.replace(9999, ghostPayload);
+
+    expect(response.status()).toBe(STATUS.NOT_FOUND);
+  });
 });

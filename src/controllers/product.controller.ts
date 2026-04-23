@@ -8,7 +8,7 @@ export class ProductController extends BaseController {
     super(new ApiClient(request), '/products');
   }
 
-  getById(id: number): Promise<APIResponse> {
+  getById(id: number | string): Promise<APIResponse> {
     return this.client.get(this.url(`/${id}`));
   }
 
