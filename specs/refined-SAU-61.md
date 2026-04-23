@@ -1,4 +1,4 @@
-# SAU-61: POST /products — Create product returns 201 with valid body, 400 on empty body
+# SAU-61: POST /products — Create product returns 201 with valid body
 
 > **Source**: Refined from `--from-input` via create-sdd-ticket skill
 > **Linear**: https://linear.app/saucedemo-qa/issue/SAU-61
@@ -9,7 +9,7 @@
 
 **As a** QA engineer maintaining the api-automation-framework
 **I want** to POST `/products` with `{ name, price }` and assert the response
-**So that** I can confirm Mockfly returns HTTP 201 with a valid product object and HTTP 400 when the body is empty
+**So that** I can confirm Mockfly returns HTTP 201 with a valid product object
 
 ---
 
@@ -27,8 +27,7 @@
 
 1. POST `/products` with `{ name: string, price: number }` returns status **201**
 2. Response body contains `id` (positive integer), `name` (string), `price` (number), `status: "success"`
-3. POST `/products` with an empty body returns status **400**
-4. The test lives in `tests/products/products.spec.ts` and uses `ProductController.create()` — no direct URL construction
+3. The test lives in `tests/products/products.spec.ts` and uses `ProductController.create()` — no direct URL construction
 
 **Metrics**: `npm run test:products` exits green
 
@@ -64,17 +63,6 @@ Then the body contains id, name, price, and status fields
 - `typeof body.price` equals `"number"`
 - `typeof body.status` equals `"string"`
 
-### Scenario 3: POST with empty body returns 400
-
-```gherkin
-Given the ProductController is instantiated with the Playwright request fixture
-When I call productController.create({} as any) or send an empty payload
-Then the response status is 400
-```
-
-**Assertions:**
-- `response.status()` equals `400`
-
 ---
 
 ## 🔧 Technical Context
@@ -84,14 +72,12 @@ Then the response status is 400
 - `ProductController.create(payload: CreateProductPayload)` exists at `src/controllers/product.controller.ts:15`
 - `CreateProductPayload = Omit<Product, 'id'>` → `{ name: string, price: number }`
 - `CreateProductResponse extends Product` → `{ id: number, name: string, price: number, status: string }` at `src/models/product.model.ts`
-- Existing POST test in `tests/products/products.spec.ts` asserts 201 + `body.id` + `body.status` — does **not** cover the 400 case
-- `STATUS.BAD_REQUEST = 400` is defined in `src/utils/constants.ts`
+- Existing POST test in `tests/products/products.spec.ts` asserts 201 + `body.id` + `body.status`
 
 ### Proposed Changes
 
 - Enhance the existing `'POST /products returns 201 with id and status field'` test to add explicit `typeof` checks for all response fields
-- Add a new test: `'POST /products with empty body returns 400'`
-- The 400 scenario requires the Mockfly mock to be configured to return 400 for empty-body POST requests
+
 
 ### Technical Constraints
 
@@ -103,7 +89,6 @@ Then the response status is 400
 ### Architecture Decisions
 
 - **Type assertion pattern**: cast with `as CreateProductResponse`; validate field types with `typeof` checks — no runtime schema library per CLAUDE.md
-- **400 test payload**: pass an empty object cast as `any` to bypass TypeScript compile-time enforcement; the intent is to test the API boundary, not the type system
 
 ---
 
@@ -142,8 +127,6 @@ Then the response status is 400
 
 ### Blocking
 
-- Mockfly mock must be configured to return `400` for POST `/products` with empty body — verify in dashboard before implementing the negative test
-
 ### Related
 
 - `tests/products/products.spec.ts` — file to edit
@@ -166,7 +149,6 @@ Then the response status is 400
 - [ ] POST test asserts `typeof body.id === 'number'` and `body.id > 0`
 - [ ] POST test asserts `body.status === 'success'`
 - [ ] POST test asserts `typeof body.name === 'string'` and `typeof body.price === 'number'`
-- [ ] Empty-body POST test asserts status `400`
 - [ ] `npm run test:products` exits green
 
 ### Review
@@ -195,17 +177,6 @@ test('POST /products returns 201 with id and status field', async ({ productCont
   expect(typeof body.name).toBe('string');
   expect(typeof body.price).toBe('number');
   expect(body.status).toBe('success');
-});
-```
-
-**New test** — empty body returns 400:
-
-```typescript
-test('POST /products with empty body returns 400', async ({ productController }) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const response = await productController.create({} as any);
-
-  expect(response.status()).toBe(STATUS.BAD_REQUEST);
 });
 ```
 

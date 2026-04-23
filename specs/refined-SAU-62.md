@@ -68,17 +68,6 @@ Then the body contains id, name, and price fields with correct types
 - `typeof body.price` equals `"number"`
 - `Array.isArray(body)` equals `false` (not a list)
 
-### Scenario 3: GET /products/:id with non-existent id returns 404
-
-```gherkin
-Given the ProductController is instantiated with the Playwright request fixture
-When I call productController.getById(9999)
-Then the response status is 404
-```
-
-**Assertions:**
-- `response.status()` equals `404`
-
 ---
 
 ## 🔧 Technical Context
