@@ -1,8 +1,8 @@
 import { test, expect }  from '@fixtures/index';
 import { expectAPI }     from '@utils/expect.helper';
-import { isPostArray } from '@utils/schema.helper';
-import { STATUS }        from '@utils/constants';
-import { type Post }     from '@models/post.model';
+import { isPost, isPostArray } from '@utils/schema.helper';
+import { STATUS }              from '@utils/constants';
+import { type Post, type CreatePostPayload } from '@models/post.model';
 
 test.describe('API Tests', () => {
 
@@ -40,6 +40,18 @@ test.describe('API Tests', () => {
     expect(Array.isArray(body)).toBe(true);
     expect(body.length).toBeGreaterThan(0);
     await expectAPI.bodyToMatchSchema(response, isPostArray);
+  });
+
+  test('PUT /posts/:id replaces a post and returns updated title', async ({ postController }) => {
+    const payload: CreatePostPayload = { userId: 1, title: 'replaced title', body: 'replaced body' };
+    const response = await postController.replace(1, payload);
+
+    expect(response.status()).toBe(STATUS.OK);
+
+    const body = await expectAPI.bodyToMatchSchema(response, isPost);
+    expect(body.title).toBe(payload.title);
+    expect(body.userId).toBe(payload.userId);
+    expect(body.body).toBe(payload.body);
   });
 
 });
