@@ -20,6 +20,7 @@ test.describe('POST /products', () => {
     expect(body.price).toBe(payload.price);
     expect(body.status).toBe('success');
   });
+
 });
 
 test.describe('GET /products/:id', () => {

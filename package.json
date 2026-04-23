@@ -5,9 +5,7 @@
   "private": true,
   "scripts": {
     "test": "playwright test",
-    "test:posts": "playwright test tests/posts",
-    "test:users": "playwright test tests/users",
-    "test:todos": "playwright test tests/todos",
+    "test:products": "playwright test tests/products",
     "report": "playwright show-report reports/html"
   },
   "devDependencies": {
