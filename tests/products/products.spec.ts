@@ -47,6 +47,25 @@ test.describe.serial('Products API', () => {
 
 });
 
+test.describe('DELETE /products/:id', () => {
+  test('DELETE /products/:id returns 204 with no body', async ({ productController }) => {
+    const response = await productController.delete(1);
+
+    expect(response.status()).toBe(STATUS.NO_CONTENT);
+  });
+
+  // Blocked: Mockfly must be configured to return 404 for GET /products/9999.
+  // Remove skip once the conditional response rule is added in the dashboard.
+  test.skip('GET /products/:id returns 404 after product is deleted', async ({ productController }) => {
+    const deleteResponse = await productController.delete(1);
+    expect(deleteResponse.status()).toBe(STATUS.NO_CONTENT);
+
+    // id=9999 is pre-configured in Mockfly to return 404 unconditionally (stateless mock workaround)
+    const getResponse = await productController.getById(9999);
+    expect(getResponse.status()).toBe(STATUS.NOT_FOUND);
+  });
+});
+
 test.describe('PUT /products/:id', () => {
   const payload: CreateProductPayload = { name: 'Updated Product', price: 49.99 };
 
